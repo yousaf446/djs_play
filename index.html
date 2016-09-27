@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Perth Map</title>
+    <title>DJ Map</title>
 
     <link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
@@ -61,23 +61,26 @@
             var dj_bounds = new google.maps.LatLngBounds();
 
             for(var i in djVenue) {
-                if(djVenue[i].venueLatitude != "0.000000000") {
+                if(djVenue[i].Latitude != "0.000000000") {
                     console.log(djVenue[i]);
-                    var coordinates = new google.maps.LatLng(djVenue[i].venueLatitude, djVenue[i].venueLongitude);
+                    var coordinates = new google.maps.LatLng(djVenue[i].Latitude, djVenue[i].Longitude);
 
                     marker[mark_counter] = new google.maps.Marker({
                         position: coordinates,
                         map: map,
                         id: mark_counter,
-                        name: djVenue[i].venueName,
-                        address: djVenue[i].venueAddress
+                        name: djVenue[i].VenueName,
+                        address: djVenue[i].VenueAddress,
+                        artist: djVenue[i].ArtistName,
+                        event: djVenue[i].EventName
 
                     });
 
                     dj_bounds.extend(marker[mark_counter].getPosition());
 
                     google.maps.event.addListener(marker[mark_counter], "click", function (event) {
-                        var content = "Venue Name: <b>" + this.name + "</b><br/>Venue Address: <b>" + this.address + "</b>";
+                        var content = "Venue Name: <b>" + this.name + "</b><br/>Venue Address: <b>" + this.address + "</b><br/>";
+                        content += "Artist Name: <b>" + this.artist + "</b><br/>Event Name: <b>" + this.event + "</b>";
                         infowindow.setContent(content);
                         infowindow.setPosition(this.getPosition());
                         infowindow.open(map);

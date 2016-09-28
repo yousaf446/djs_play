@@ -72,7 +72,8 @@
                         name: djVenue[i].VenueName,
                         address: djVenue[i].VenueAddress,
                         artist: djVenue[i].ArtistName,
-                        event: djVenue[i].EventName
+                        event: djVenue[i].EventName,
+                        date: djVenue[i].Date
 
                     });
 
@@ -80,15 +81,16 @@
 
                     google.maps.event.addListener(marker[mark_counter], "click", function (event) {
                         var content = "Venue Name: <b>" + this.name + "</b><br/>Venue Address: <b>" + this.address + "</b><br/>";
-                        content += "Artist Name: <b>" + this.artist + "</b><br/>Event Name: <b>" + this.event + "</b>";
+                        content += "Artist Name: <b>" + this.artist + "</b><br/>Event Name: <b>" + this.event + "</b><br/>";
+                        content += "Event Date: <b>" + this.date + "</b>";
                         infowindow.setContent(content);
                         infowindow.setPosition(this.getPosition());
                         infowindow.open(map);
                     });
-
                     mark_counter++;
                 }
             }
+
             map.fitBounds(dj_bounds);
         }
 

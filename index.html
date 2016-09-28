@@ -31,6 +31,8 @@
             center: new google.maps.LatLng(-31.9505, 115.8605)
         };
 
+        var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
         var mark_counter = 0;
 
         var infowindow = new google.maps.InfoWindow();
@@ -62,7 +64,6 @@
 
             for(var i in djVenue) {
                 if(djVenue[i].Latitude != "0.000000000") {
-                    console.log(djVenue[i]);
                     var coordinates = new google.maps.LatLng(djVenue[i].Latitude, djVenue[i].Longitude);
 
                     marker[mark_counter] = new google.maps.Marker({
@@ -80,9 +81,12 @@
                     dj_bounds.extend(marker[mark_counter].getPosition());
 
                     google.maps.event.addListener(marker[mark_counter], "click", function (event) {
-                        var content = "Venue Name: <b>" + this.name + "</b><br/>Venue Address: <b>" + this.address + "</b><br/>";
-                        content += "Artist Name: <b>" + this.artist + "</b><br/>Event Name: <b>" + this.event + "</b><br/>";
-                        content += "Event Date: <b>" + this.date + "</b>";
+                        var d = new Date(this.date);
+                        var dateArray = String(d).split(" ");
+                        var date = dateArray[0] + " " + dateArray[1] + " " + dateArray[2] + " " + dateArray[3];
+                        var content = "<b>" + this.artist + "</b><br/>Date: <b>" + date + "</b><br/>";
+                        content += "Event Name: <b>" + this.event + "</b><br/>Venue Name: <b>" + this.name + "</b><br/>";
+                        content += "Venue Address: <b>" + this.address + "</b>";
                         infowindow.setContent(content);
                         infowindow.setPosition(this.getPosition());
                         infowindow.open(map);

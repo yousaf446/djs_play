@@ -84,7 +84,7 @@
                         var d = new Date(this.date);
                         var dateArray = String(d).split(" ");
                         var date = dateArray[0] + " " + dateArray[1] + " " + dateArray[2] + " " + dateArray[3];
-                        var content = "<b>" + this.artist + "</b><br/>Date: <b>" + date + "</b><br/>";
+                        var content = "<h4><b>" + this.artist + "</b></h4>Date: <b>" + date + "</b><br/>";
                         content += "Event Name: <b>" + this.event + "</b><br/>Venue Name: <b>" + this.name + "</b><br/>";
                         content += "Venue Address: <b>" + this.address + "</b>";
                         infowindow.setContent(content);

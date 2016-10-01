@@ -1,14 +1,14 @@
 var djVenue = [{
     "id": "1",
-    "ArtistName": "Bella Sarris",
-    "EventName": "Tini and the Gang",
-    "Date": "2016-06-15",
-    "VenueName": "Loud-Contact Area",
-    "VenueAddress": "Cami de la Foixarda s\/n Poble Espanyol",
-    "Latitude": "0.000000000",
-    "Longitude": "0.000000000",
+    "ArtistName": "Ben Klock",
+    "EventName": "Ben Klock",
+    "Date": "2016-06-17",
+    "VenueName": "Block",
+    "VenueAddress": "59, rue des Terres Neuves, 33130 B\u00e8gles,",
+    "Latitude": "44.813424900",
+    "Longitude": "-0.552363900",
     "City": null,
-    "Country": "Spain"
+    "Country": "France"
 }, {
     "id": "2",
     "ArtistName": "Ben Klock",

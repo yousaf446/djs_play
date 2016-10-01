@@ -22,13 +22,16 @@
 
     <script src="dj_venue.js"></script>
 
+    <script src="map_styles.js"></script>
+
     <script type="text/javascript">
         var marker = [];
         var map;
         var mapOptions = {
             zoom: 10,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
-            center: new google.maps.LatLng(-31.9505, 115.8605)
+            center: new google.maps.LatLng(-31.9505, 115.8605),
+            styles: map_styles
         };
 
         var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -70,8 +73,8 @@
                         position: coordinates,
                         map: map,
                         id: mark_counter,
-                        name: djVenue[i].VenueName,
-                        address: djVenue[i].VenueAddress,
+                        name: djVenue[i].venueName,
+                        address: djVenue[i].venueAddress,
                         artist: djVenue[i].ArtistName,
                         event: djVenue[i].EventName,
                         date: djVenue[i].Date

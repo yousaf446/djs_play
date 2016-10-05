@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Artist Map</title>
+
+    <link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JQuery -->
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+    <!-- Latest compiled and minified Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyA7xY6JgrR-hAOLs1ZmZU9vCoFNb_YQ7qI"></script>
+
+    <script src="dj_venue.js"></script>
+
+    <script src="map_styles.js"></script>
+
+    <script src="oms.min.js"></script>
+
+    <script type="text/javascript">
+        var gm = google.maps;
+        var oms;
+        var marker = [];
+        var icon = new google.maps.MarkerImage(
+                "venue.png",
+                null, /* size is determined at runtime */
+                null, /* origin is 0,0 */
+                new google.maps.Point(16, 16), /* anchor is bottom center of the scaled image */
+                new google.maps.Size(32, 32)
+        );
+        var map;
+        var mapOptions = {
+            zoom: 10,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            center: new google.maps.LatLng(-31.9505, 115.8605),
+            styles: map_styles
+        };
+
+        var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+        var mark_counter = 0;
+
+        var infowindow = new google.maps.InfoWindow();
+
+        function initialize() {
+            map = new google.maps.Map(document.getElementById("map_canvas"),
+                    mapOptions);
+
+            oms = new OverlappingMarkerSpiderfier(map);
+
+            var address = (document.getElementById('address'));
+            var fullscreen = document.getElementById('fullscreen');
+            map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(fullscreen);
+            var autocomplete = new google.maps.places.Autocomplete(address);
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                $("#searchPanel").collapse('hide');
+                infowindow.close();
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    return;
+                }
+                map.setCenter(place.geometry.location);
+                map.setZoom(10);
+            });
+
+            getArtistData();
+        }
+
+        function getArtistData() {
+            var artist = getParamValue('artist');
+            $.get('maps_api.php?artist='+artist, function(response) {
+                var artistData = JSON.parse(response);
+                var dj_bounds = new google.maps.LatLngBounds();
+                var artistDetail  = artistData[0].artistDetail;
+                var artistEvents  = artistData[0].events;
+                console.log(artistEvents);
+                for(var i in artistEvents) {
+                    var eventData = artistEvents[i].eventDetail;
+                    var venueData = artistEvents[i].venueDetail;
+                    if(venueData.venueLatitude != "0.000000000") {
+                        var coordinates = new google.maps.LatLng(venueData.venueLatitude, venueData.venueLongitude);
+
+                        marker[mark_counter] = new google.maps.Marker({
+                            position: coordinates,
+                            map: map,
+                            id: mark_counter,
+                            venue: venueData.venueName,
+                            address: venueData.venueAddress,
+                            artist: artistDetail.artist,
+                            event: eventData.eventName,
+                            date: eventData.date,
+                            startTime: eventData.startTime,
+                            endTime: eventData.endTime,
+                            city: venueData.city,
+                            country: venueData.country,
+                            icon: icon,
+                            type: eventData.eventType
+
+                        });
+
+                        dj_bounds.extend(marker[mark_counter].getPosition());
+
+                        google.maps.event.addListener(marker[mark_counter], "mouseover", function (event) {
+                            var d = new Date(this.date);
+                            var dateArray = String(d).split(" ");
+                            var date = dateArray[0] + " " + dateArray[1] + " " + dateArray[2] + " " + dateArray[3];
+                            var time = "";
+                            if(this.startTime != "") time += this.startTime;
+                            if((this.endTime != "") && (time != "")) time += " - " + this.endTime;
+                            else time += this.endTime;
+                            var content = "<h4><b>" + this.artist + "</b></h4>Date: <b>" + date + "</b><br/>";
+                            if(this.startTime != "" || this.endTime != "") content += "Time: <b>" + time + "</b><br/>";
+                            content += "Event Name: <b>" + this.event + "</b><br/>Venue Name: <b>" + this.venue + "</b><br/>";
+                            if(this.address != "") content += "Venue Address: <b>" + this.address + "</b><br/>";
+                            if(this.city != "") content += "Venue City: <b>" + this.city + "</b><br/>";
+                            if(this.country != "") content += "Venue Country: <b>" + this.country + "</b>";
+                            infowindow.setContent(content);
+                            infowindow.setPosition(this.getPosition());
+                            infowindow.open(map);
+                        });
+                        google.maps.event.addListener(marker[mark_counter], "mouseout", function (event) {
+                            infowindow.close();
+                        });
+                        oms.addMarker(marker[mark_counter]);
+                        mark_counter++;
+                    }
+                }
+
+                map.fitBounds(dj_bounds);
+            });
+        }
+
+        function getEvents(type) {
+            $("#searchPanel").collapse('hide');
+            infowindow.close();
+            var dj_bounds = new google.maps.LatLngBounds();
+            for(var i in marker) {
+                if(type == "all") {
+                    marker[i].setVisible(true);
+                    dj_bounds.extend(marker[i].getPosition());
+                } else {
+                    if(marker[i].type == type) {
+                        marker[i].setVisible(true);
+                        dj_bounds.extend(marker[i].getPosition());
+                    } else {
+                        marker[i].setVisible(false);
+                    }
+                }
+            }
+            map.fitBounds(dj_bounds);
+        }
+
+        function getParamValue(paramName)
+        {
+            var url = window.location.search.substring(1); //get rid of "?" in querystring
+            var qArray = url.split('&'); //get key-value pairs
+            for (var i = 0; i < qArray.length; i++)
+            {
+                var pArr = qArray[i].split('='); //split key and value
+                if (pArr[0] == paramName)
+                    return pArr[1]; //return value
+            }
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+</head>
+<body>
+<div class="panel panel-default panel-style">
+    <div class="panel-heading" role="tab" id="headingOne">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#searchPanel" aria-expanded="false" aria-controls="searchPanel">
+                Search Filters
+            </a>
+        </h4>
+    </div>
+    <div id="searchPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Search By Address</label>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="address" name="address" placeholder="Search Address" />
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-2">
+                        <label>Filter By Date</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="radio" id="all-events" name="events" checked style="margin-right:10px" onclick="getEvents('all')" />All Events
+                    </div>
+                    <div class="col-md-2">
+                        <input type="radio" id="past-events" name="events" style="margin-right:10px" onclick="getEvents('past')" />Past Events
+                    </div>
+                    <div class="col-md-2">
+                        <input type="radio" id="future-events" name="events" style="margin-right:10px" onclick="getEvents('future')" />Future Events
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="map_canvas" style="position: absolute !important;width: 100%; height: 90%"></div>
+</body>
+</html>

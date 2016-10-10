@@ -19,8 +19,14 @@
 
 </head>
 <body>
-<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#artistMapModal">
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" onclick="getArtistMap()" data-target="#artistMapModal">
     Show Map
+</button>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" onclick="getFullArtistMap()" data-target="#artistMapBigModal">
+    Show Big
+</button>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" onclick="getRegionMap()" data-target="#TerritoryMap">
+    Show Territory Map
 </button>
 <div class="modal fade" tabindex="-1" role="dialog" id="artistMapModal">
     <div class="modal-dialog" role="document">
@@ -30,10 +36,51 @@
                 <h4 class="modal-title">Artist Map</h4>
             </div>
             <div class="modal-body">
-                <iframe src="artist_map.html?artist=1" height="500px" width="550px"></iframe>
+                <iframe id="artistMap" src="artist_map.html?artist=1" height="500px" width="550px"></iframe>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="artistMapBigModal" style="width: 1300px;height:800px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 1200px;height:700px;float: left;margin-left: -300px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Artist Map</h4>
+            </div>
+            <div class="modal-body">
+                <iframe id="fullArtistMap" src="artist_map.html?artist=1" height="600px" width="1150px"></iframe>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="TerritoryMap" style="width: 1300px;height:800px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 1200px;height:700px;float: left;margin-left: -300px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Territory Map</h4>
+            </div>
+            <div class="modal-body">
+                <iframe id="regionMap" src="region.html?territory=AUS" height="600px" width="1150px"></iframe>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 </body>
+<script type="text/javascript">
+    function getRegionMap() {
+        document.getElementById('regionMap').contentWindow.getRegionalData();
+    }
+
+    function getArtistMap() {
+        document.getElementById('artistMap').contentWindow.getArtistData();
+    }
+
+    function getFullArtistMap() {
+        document.getElementById('fullArtistMap').contentWindow.getArtistData();
+    }
+</script>
 </html>

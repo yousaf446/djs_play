@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Artist Map</title>
+    <title>Country Map</title>
 
     <link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
@@ -19,8 +19,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyA7xY6JgrR-hAOLs1ZmZU9vCoFNb_YQ7qI"></script>
-
-    <script src="dj_venue.js"></script>
 
     <script src="map_styles.js"></script>
 
@@ -71,18 +69,19 @@
                 map.setZoom(10);
             });
 
+            getCountryData();
         }
 
-        function getArtistData() {
-            var artist = getParamValue('artist');
-            $.get('maps_api.php?artist='+artist, function(response) {
-                var artistData = JSON.parse(response);
-                var artistDetail  = artistData[0].artistDetail;
-                var artistEvents  = artistData[0].events;
-                console.log(artistEvents);
-                for(var i in artistEvents) {
-                    var eventData = artistEvents[i].eventDetail;
-                    var venueData = artistEvents[i].venueDetail;
+        function getCountryData() {
+            var country = getParamValue('country');
+            $.get('maps_api_region.php?country=AR', function(response) {
+                var countryData = JSON.parse(response);
+                var dj_bounds = new google.maps.LatLngBounds();
+                var countryEvents  = countryData.events;
+                for(var i in countryEvents) {
+                    var artistData = countryEvents[i].artistDetail;
+                    var eventData = countryEvents[i].eventDetail;
+                    var venueData = countryEvents[i].venueDetail;
                     if(venueData.venueLatitude != "0.000000000") {
                         var coordinates = new google.maps.LatLng(venueData.venueLatitude, venueData.venueLongitude);
 
@@ -92,7 +91,7 @@
                             id: mark_counter,
                             venue: venueData.venueName,
                             address: venueData.venueAddress,
-                            artist: artistDetail.artist,
+                            artist: artistData.artist,
                             event: eventData.eventName,
                             date: eventData.date,
                             startTime: eventData.startTime,
@@ -104,17 +103,19 @@
 
                         });
 
+                        dj_bounds.extend(marker[mark_counter].getPosition());
+
                         google.maps.event.addListener(marker[mark_counter], "mouseover", function (event) {
                             var d = new Date(this.date);
                             var dateArray = String(d).split(" ");
-                            var date = dateArray[0] + " / " + dateArray[1];
+                            var date = dateArray[0] + " " + dateArray[1] + " " + dateArray[2] + " " + dateArray[3];
                             var time = "";
                             if(this.startTime != "") time += this.startTime;
                             if((this.endTime != "") && (time != "")) time += " - " + this.endTime;
                             else time += this.endTime;
-                            var content = "<h4><b>" + this.artist + " - " + date +" / " + this.event + "</b></h4><br/>";
+                            var content = "<h4><b>" + this.artist + "</b></h4>Date: <b>" + date + "</b><br/>";
                             if(this.startTime != "" || this.endTime != "") content += "Time: <b>" + time + "</b><br/>";
-                            content += "Venue Name: <b>" + this.venue + "</b><br/>";
+                            content += "Event Name: <b>" + this.event + "</b><br/>Venue Name: <b>" + this.venue + "</b><br/>";
                             if(this.address != "") content += "Venue Address: <b>" + this.address + "</b><br/>";
                             if(this.city != "") content += "Venue City: <b>" + this.city + "</b><br/>";
                             if(this.country != "") content += "Venue Country: <b>" + this.country + "</b>";
@@ -130,27 +131,28 @@
                     }
                 }
                 getEvents('future');
+                //map.fitBounds(dj_bounds);
             });
         }
 
         function getEvents(type) {
             $("#searchPanel").collapse('hide');
             infowindow.close();
-            var artist_bounds = new google.maps.LatLngBounds();
+            var dj_bounds = new google.maps.LatLngBounds();
             for(var i in marker) {
                 if(type == "all") {
                     marker[i].setVisible(true);
-                    artist_bounds.extend(marker[i].getPosition());
+                    dj_bounds.extend(marker[i].getPosition());
                 } else {
                     if(marker[i].type == type) {
                         marker[i].setVisible(true);
-                        artist_bounds.extend(marker[i].getPosition());
+                        dj_bounds.extend(marker[i].getPosition());
                     } else {
                         marker[i].setVisible(false);
                     }
                 }
             }
-            map.fitBounds(artist_bounds);
+            map.fitBounds(dj_bounds);
         }
 
         function getParamValue(paramName)

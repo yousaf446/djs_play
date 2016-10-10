@@ -30,13 +30,7 @@
         var gm = google.maps;
         var oms;
         var marker = [];
-        var icon = new google.maps.MarkerImage(
-                "venue.png",
-                null, /* size is determined at runtime */
-                null, /* origin is 0,0 */
-                new google.maps.Point(16, 16), /* anchor is bottom center of the scaled image */
-                new google.maps.Size(32, 32)
-        );
+
         var map;
         var mapOptions = {
             zoom: 10,
@@ -50,6 +44,8 @@
         var mark_counter = 0;
 
         var infowindow = new google.maps.InfoWindow();
+
+        var future_mark = 1;
 
         function initialize() {
             map = new google.maps.Map(document.getElementById("map_canvas"),
@@ -86,6 +82,26 @@
                     if(venueData.venueLatitude != "0.000000000") {
                         var coordinates = new google.maps.LatLng(venueData.venueLatitude, venueData.venueLongitude);
 
+                        if(eventData.eventType == 'past') {
+                            var iconURL = new google.maps.MarkerImage(
+                                    "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                                    null, /* size is determined at runtime */
+                                    null, /* origin is 0,0 */
+                                    null, /* anchor is bottom center of the scaled image */
+                                    new google.maps.Size(36, 48)
+                            );
+                        }
+                        else {
+                            var iconURL = new google.maps.MarkerImage(
+                                    "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld="+future_mark+"|00E44C|000000",
+                                    null, /* size is determined at runtime */
+                                    null, /* origin is 0,0 */
+                                    null, /* anchor is bottom center of the scaled image */
+                                    new google.maps.Size(36, 36)
+                            );
+                            future_mark++;
+                        }
+
                         marker[mark_counter] = new google.maps.Marker({
                             position: coordinates,
                             map: map,
@@ -99,7 +115,7 @@
                             endTime: eventData.endTime,
                             city: venueData.city,
                             country: venueData.country,
-                            icon: icon,
+                            icon: iconURL,
                             type: eventData.eventType
 
                         });

@@ -120,11 +120,12 @@
 
                         });
 
-                        google.maps.event.addListener(marker[mark_counter], "mouseover", function (event) {
+                        google.maps.event.addListener(marker[mark_counter], "click", function (event) {
                             var d = new Date(this.date);
                             var dateArray = String(d).split(" ");
                             var date = dateArray[0] + " / " + dateArray[1];
                             var time = "";
+                            var google_search = 'https://www.google.com/search?q=' + this.event;
                             if(this.startTime != "") time += this.startTime;
                             if((this.endTime != "") && (time != "")) time += " - " + this.endTime;
                             else time += this.endTime;
@@ -133,14 +134,13 @@
                             content += "Venue Name: <b>" + this.venue + "</b><br/>";
                             if(this.address != "") content += "Venue Address: <b>" + this.address + "</b><br/>";
                             if(this.city != "") content += "Venue City: <b>" + this.city + "</b><br/>";
-                            if(this.country != "") content += "Venue Country: <b>" + this.country + "</b>";
+                            if(this.country != "") content += "Venue Country: <b>" + this.country + "</b><br/>";
+                            content += "<a href='"+google_search+"' target='_blank'>Search Tickets</a>";
                             infowindow.setContent(content);
                             infowindow.setPosition(this.getPosition());
                             infowindow.open(map);
                         });
-                        google.maps.event.addListener(marker[mark_counter], "mouseout", function (event) {
-                            infowindow.close();
-                        });
+
                         oms.addMarker(marker[mark_counter]);
                         mark_counter++;
                     }

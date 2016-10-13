@@ -123,9 +123,9 @@
                         google.maps.event.addListener(marker[mark_counter], "click", function (event) {
                             var d = new Date(this.date);
                             var dateArray = String(d).split(" ");
-                            var date = dateArray[0] + " / " + dateArray[1];
+                            var date = dateArray[0] + " / " + dateArray[2] + " " + dateArray[1];
                             var time = "";
-                            var google_search = 'https://www.google.com/search?q=' + this.event;
+                            var google_search = 'https://www.google.com/search?q=' + this.artist + " " + this.event + " Tickets " + this.date;
                             if(this.startTime != "") time += this.startTime;
                             if((this.endTime != "") && (time != "")) time += " - " + this.endTime;
                             else time += this.endTime;

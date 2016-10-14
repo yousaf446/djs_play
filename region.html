@@ -112,7 +112,7 @@
                         }
                         else {
                             var iconURL = new google.maps.MarkerImage(
-                                    "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld="+future_mark+"|00E44C|000000",
+                                    "http://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|00E44C|16|_|"+future_mark,
                                     null, /* size is determined at runtime */
                                     null, /* origin is 0,0 */
                                     null, /* anchor is bottom center of the scaled image */
@@ -169,6 +169,8 @@
         function getEvents(type) {
             $("#searchPanel").collapse('hide');
             infowindow.close();
+            var future_count = 0;
+            var map_center;
             var region_bounds = new google.maps.LatLngBounds();
             for(var i in marker) {
                 if(type == "all") {
@@ -176,14 +178,18 @@
                     region_bounds.extend(marker[i].getPosition());
                 } else {
                     if(marker[i].type == type) {
+                        if(future_count == 0) map_center = marker[i].getPosition();
                         marker[i].setVisible(true);
                         region_bounds.extend(marker[i].getPosition());
+                        future_count++;
                     } else {
                         marker[i].setVisible(false);
                     }
                 }
             }
+            console.log(region_bounds);
             region_map.fitBounds(region_bounds);
+            region_map.setCenter(map_center);
             $("#overlay").hide();
             google.maps.event.trigger(region_map, 'resize');
         }

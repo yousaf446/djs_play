@@ -151,20 +151,25 @@
             $("#searchPanel").collapse('hide');
             infowindow.close();
             var artist_bounds = new google.maps.LatLngBounds();
+            var future_count = 0;
+            var map_center;
             for(var i in marker) {
                 if(type == "all") {
                     marker[i].setVisible(true);
                     artist_bounds.extend(marker[i].getPosition());
                 } else {
                     if(marker[i].type == type) {
+                        if(future_count == 0) map_center = marker[i].getPosition();
                         marker[i].setVisible(true);
                         artist_bounds.extend(marker[i].getPosition());
+                        future_count++;
                     } else {
                         marker[i].setVisible(false);
                     }
                 }
             }
             map.fitBounds(artist_bounds);
+            map.setCenter(map_center);
         }
 
         function getParamValue(paramName)
